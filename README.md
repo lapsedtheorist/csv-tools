@@ -20,6 +20,12 @@ comma it encounters on a line is a separator or part of a real value.
 **csv-headings** returns the contents of the first line of the file as a base-1
 numbered list. Normally one would use this to read the headings in a file.
 
+**csv-cut** expects as its argument a comma separated list of base-1 indexes
+for the fields to extract from the data. If there is no value in the data, a
+blank is returned for that field. This tool can also be used to re-arrange
+fields as the fields listed are returned in the *listed* order, not the source
+data order.
+
 **csv-merge** expects two filenames on the command line, rather than using
 stdin. CSV data is returned on stdout. The first column is expected to contain
 the identifier and the value of this column will be used as the match. The data

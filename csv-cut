@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+/*	Extract columns from a CSV (sent over stdin), picking only those columns 
+ *	specified by a comma separated list as the first argument. Return the 
+ *	fields in the order specified by the list.	
+ */
+$sequence = array_map(
+	function ($base1index) {
+		return $base1index - 1;
+	},
+	str_getcsv($_SERVER['argv'][1])
+);
+while( ($fields = fgetcsv(STDIN))!==false ) {
+	$reordered_data = array();
+	foreach($sequence as $base0index) {
+		$reordered_data[] = (isset($fields[$base0index]) ? $fields[$base0index] : '');
+	}
+	fputcsv(STDOUT, $reordered_data);
+}
