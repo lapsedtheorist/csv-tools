@@ -1,0 +1,37 @@
+#!/usr/bin/env php
+<?php
+/*
+ * Merge two CSV files, by a common (unique) identifier in column 1
+ */
+ini_set('memory_limit', '512M');
+
+/*
+ *	Read the second file and unique index it by first column
+ */
+$i2 = fopen($_SERVER['argv'][2], 'r');
+$h2 = fgetcsv($i2, 4096);
+array_shift($h2);
+$data = array();
+while( ($fields = fgetcsv($i2, 4096))!==false ) {
+	$key = array_shift($fields);
+	$data[$key] = $fields;
+}
+fclose($i2);
+
+/*
+ *	Read the first file and match the index with the data from the second file, 
+ *	padding with spaces as necessary
+ */
+$i1 = fopen($_SERVER['argv'][1], 'r');
+$h1 = fgetcsv($i1, 4096);
+$headings = array_merge($h1, $h2);
+$blanks = array_fill(0, count($headings), '');
+fputcsv(STDOUT, $headings);
+while( ($fields = fgetcsv($i1, 4096))!==false ) {
+	if(isset($data[$fields[0]])) {
+		fputcsv(STDOUT, array_merge($fields, $data[$fields[0]]));
+	} else {
+		fputcsv(STDOUT, $fields+$blanks);
+	}
+}
+fclose($i1);
