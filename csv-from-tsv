@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+$headings = fgetcsv(STDIN, 0, "\t");
+fputcsv(STDOUT, $headings);
+$blanks = array_fill(0, count($headings), '');
+while( ($fields = fgetcsv(STDIN, 0, "\t"))!==false ) {
+	fputcsv(STDOUT, $fields+$blanks);
+}
