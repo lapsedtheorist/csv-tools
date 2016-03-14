@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+$headings = fgetcsv(STDIN);
+$n = count($headings);
+$w = max(ceil(log($n, 10)), 6);
+foreach($headings as $i=>$heading) {
+	printf("%{$w}d\t%s".PHP_EOL, $i+1, $heading);
+}
