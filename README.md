@@ -2,12 +2,12 @@
 Basic CSV file processing tools, as shell scripts, piggybacked on PHP's CSV
 parsing functions.
 
-All scripts expect data over stdin and will return their output on stdout. They
-make an effort to be minimally resource intensive as far as possible, operating
-on the input stream line-by-line rather than reading the whole data set at
-once. The only script that reads a whole data set in one go is `csv-merge`,
-which only reads one of the data sets and has a memory limit tweak to
-accommodate this for relatively large files.
+All scripts expect CSV data over stdin and will return their output on stdout.
+They make an effort to be minimally resource intensive as far as possible,
+operating on the input stream line-by-line rather than reading the whole data
+set at once. The only script that reads a whole data set in one go is
+`csv-merge`, which only reads one of the data sets and has a memory limit tweak
+to accommodate this for relatively large files.
 
 **csv-to-tsv** and **csv-from-tsv** are simple converters for comma-separated
 format files into tab-separated format. Tab characters are much less common in
@@ -42,3 +42,8 @@ follows:
   second file
 - If the identifier exists in the second file but not in the first, the output
   data will not contain the data for this identifier
+
+**csv-from-json** expects a file containing one JSON structure per line as the
+first argument and will take the simple processing step of converting the top
+level keys of the JSON structure to the headings of the CSV output data. Nested
+JSON structures are included in the output as JSON.

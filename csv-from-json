@@ -1,0 +1,37 @@
+#!/usr/bin/env php
+<?php
+function flatten_arrays_to_json($value) {
+	if(is_array($value)) {
+		if(count($value)==1) {
+			return flatten_arrays_to_json(current($value));
+		} else {
+			return json_encode($value, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+		}
+	} else {
+		return $value;
+	}
+}
+$I = fopen($_SERVER['argv'][1], 'r');
+
+$headings = array();
+$idx = 0;
+// 1st pass to read all headings, so we collect them all
+while( ($json = fgets($I))!==false ) {
+	$data = json_decode($json, true);
+	foreach($data as $k=>$v) {
+		if(!isset($headings[$k])) $headings[$k] = $idx++;
+	}
+}
+fputcsv(STDOUT, array_keys($headings));
+// 2nd pass to collate data against headings, substituting blanks as applicable
+rewind($I);
+while( ($json = fgets($I))!==false ) {
+	$data = json_decode($json, true);
+	$organised_data = array();
+	foreach($headings as $heading=>$idx) {
+		$organised_data[$heading] = flatten_arrays_to_json(isset($data[$heading]) ? $data[$heading] : '');
+	}
+	fputcsv(STDOUT, $organised_data);
+}
+
+fclose($I);
