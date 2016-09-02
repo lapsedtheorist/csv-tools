@@ -1,0 +1,13 @@
+#!/bin/bash
+###
+#   Perform frequency analysis of every single byte found in stdin, then write
+#   the frequency, hexadecimal, decimal and binary to stdout
+###
+xxd -c1 | \
+cut -c10-12 | \
+sort | \
+uniq -c | \
+while IFS=' ' read -a byte; do
+	printf "%8s %s %03d " ${byte[0]} 0x${byte[1]} $((0x${byte[1]}));
+	echo -e '\x'${byte[1]};
+done
