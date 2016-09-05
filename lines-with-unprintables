@@ -2,4 +2,4 @@
 ###
 #   Filter stdin to only return lines containing unprintable byte sequences
 ###
-perl -ne 'print "$. $_" if m/[\x00-\x08\x11\x12\x14-\x1F\x80-\xFF]/'
+perl -ne 'print "$_" if m/[\x00-\x08\x11\x12\x14-\x1F\x80-\xFF]/'
