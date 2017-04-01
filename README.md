@@ -44,6 +44,6 @@ follows:
   data will not contain the data for this identifier
 
 **csv-from-json** expects a file containing one JSON structure per line as the
-first argument and will take the simple processing step of converting the top
-level keys of the JSON structure to the headings of the CSV output data. Nested
-JSON structures are included in the output as JSON.
+first argument and will take the simple processing step of converting the
+keys of the JSON structure to the headings of the CSV output data. Levels of
+hierarchy are indicated in the output by the use of dots as separators.

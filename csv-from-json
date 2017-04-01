@@ -1,37 +1,34 @@
 #!/usr/bin/env php
 <?php
-function flatten_arrays_to_json($value) {
+// Recursive flatten an N-level nested structure
+function flatten($value, $prefix=null) {
 	if(is_array($value)) {
-		if(count($value)==1) {
-			return flatten_arrays_to_json(current($value));
-		} else {
-			return json_encode($value, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+		$flat = array();
+		foreach($value as $attr=>$val) {
+			$flat = array_merge($flat, flatten($val, (isset($prefix) ? $prefix.'.'.$attr : $attr)));
 		}
+		return $flat;
 	} else {
-		return $value;
+		return (isset($prefix) ? array($prefix=>$value) : $value);
 	}
 }
+
 $I = fopen($_SERVER['argv'][1], 'r');
 
 $headings = array();
-$idx = 0;
 // 1st pass to read all headings, so we collect them all
 while( ($json = fgets($I))!==false ) {
-	$data = json_decode($json, true);
+	$data = flatten(json_decode($json, true));
 	foreach($data as $k=>$v) {
-		if(!isset($headings[$k])) $headings[$k] = $idx++;
+		if(!isset($headings[$k])) $headings[$k] = '';
 	}
 }
 fputcsv(STDOUT, array_keys($headings));
-// 2nd pass to collate data against headings, substituting blanks as applicable
+// 2nd pass to collate data against headings, allowing blanks as applicable
 rewind($I);
 while( ($json = fgets($I))!==false ) {
-	$data = json_decode($json, true);
-	$organised_data = array();
-	foreach($headings as $heading=>$idx) {
-		$organised_data[$heading] = flatten_arrays_to_json(isset($data[$heading]) ? $data[$heading] : '');
-	}
-	fputcsv(STDOUT, $organised_data);
+	$data = flatten(json_decode($json, true));
+	fputcsv(STDOUT, array_replace($headings, $data));
 }
 
 fclose($I);
