@@ -13,16 +13,34 @@ function flatten($value, $prefix=null) {
 	}
 }
 
+// Recursively merge two arrays returning an array with all possible keys,
+// setting all leaf values to a default
+function collate_all_keys($a, $b, $leaf_value=null) {
+	foreach($b as $k=>$v) {
+		if(!is_null($v)) {
+			$a[$k] = (is_array($v)
+				? collate_all_keys(
+					(isset($a[$k])
+					? $a[$k]
+					: array()),
+					$v,
+					$leaf_value
+				)
+				: $leaf_value);
+		}
+	}
+	return $a;
+}
+
 $I = fopen($_SERVER['argv'][1], 'r');
 
-$headings = array();
-// 1st pass to read all headings, so we collect them all
+$keys = array();
+// 1st pass to read all keys, so we collect them all
 while( ($json = fgets($I))!==false ) {
-	$data = flatten(json_decode($json, true));
-	foreach($data as $k=>$v) {
-		if(!isset($headings[$k])) $headings[$k] = '';
-	}
+	$data = json_decode($json, true);
+	$keys = collate_all_keys($keys, $data);
 }
+$headings = flatten($keys);
 fputcsv(STDOUT, array_keys($headings));
 // 2nd pass to collate data against headings, allowing blanks as applicable
 rewind($I);
@@ -30,5 +48,4 @@ while( ($json = fgets($I))!==false ) {
 	$data = flatten(json_decode($json, true));
 	fputcsv(STDOUT, array_replace($headings, $data));
 }
-
 fclose($I);

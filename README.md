@@ -43,7 +43,9 @@ follows:
 - If the identifier exists in the second file but not in the first, the output
   data will not contain the data for this identifier
 
-**csv-from-json** expects a file containing one JSON structure per line as the
-first argument and will take the simple processing step of converting the
-keys of the JSON structure to the headings of the CSV output data. Levels of
-hierarchy are indicated in the output by the use of dots as separators.
+**csv-from-jsonl** expects a file in JSON Lines format (containing one JSON
+structure per line) as the first argument (NOTE: not stdin) and will take the
+simple processing step of converting the keys of the JSON structure to the
+headings of the CSV output data. Levels of hierarchy are indicated in the
+output by the use of dots as separators and headings from JSON arrays are
+collated. JSON NULL values are ignored.
