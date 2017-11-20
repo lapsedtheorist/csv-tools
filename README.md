@@ -43,6 +43,12 @@ follows:
 - If the identifier exists in the second file but not in the first, the output
   data will not contain the data for this identifier
 
+**csv-filter-by-regex** and **csv-filter-by-set-of-values** expect a first
+argument as the base-1 index of the column to test, with the second argument
+being the regex or a filename containing one value per line respectively. For
+each case, where the value in the test colum matches the regex or a line in the
+file, the full original CSV data is returned.
+
 **csv-from-jsonl** expects a file in JSON Lines format (containing one JSON
 structure per line) as the first argument (NOTE: not stdin) and will take the
 simple processing step of converting the keys of the JSON structure to the

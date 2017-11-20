@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+/*
+ * If the column identified by the first argument (base 1) contains a value
+ * matching a line in the file supplied in the second argument, return the row
+ */
+$column = $_SERVER['argv'][1]-1;
+$indexed_set_of_values = array_flip(array_map(
+	function ($value) {
+		return trim($value);
+	},
+	file($_SERVER['argv'][2])
+));
+$headings = fgetcsv(STDIN);
+fputcsv(STDOUT, $headings);
+while( ($fields = fgetcsv(STDIN))!==false ) {
+	if(isset($indexed_set_of_values[$fields[$column]])) fputcsv(STDOUT, $fields);
+}
+

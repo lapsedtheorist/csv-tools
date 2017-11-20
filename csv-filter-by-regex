@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+/*
+ * If the column identified by the first argument (base 1) matches the regex
+ * supplied in the second argument, return the row
+ */
+$column = $_SERVER['argv'][1]-1;
+$filter_match = $_SERVER['argv'][2];
+$headings = fgetcsv(STDIN);
+fputcsv(STDOUT, $headings);
+while( ($fields = fgetcsv(STDIN))!==false ) {
+	if(preg_match('/'.$filter_match.'/', $fields[$column])) fputcsv(STDOUT, $fields);
+}
