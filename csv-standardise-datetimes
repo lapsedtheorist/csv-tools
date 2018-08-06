@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+/*	Standardise the datetime formats in CSV data
+ *	
+ *	Arguments:
+ *	1	CSV of base-1 column indexes that should be parsed as dates
+ *	2	The input format used (see http://php.net/manual/en/datetime.createfromformat.php)
+ *	3	The output format (optional; defaults to ISO 8601 unless specified)
+ *	4	The time zone of the input datetimes (optional; ignored for input datetimes that specify a timezone)
+ *	5	The time zone of the output datetimes (optional; UTC unless specified)
+ */
+$date_fields = array_map(
+	function ($base1index) {
+		return $base1index - 1;
+	},
+	str_getcsv($_SERVER['argv'][1])
+);
+$input_format = (isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : 'Y-M-D H:i:s');
+$output_format = (isset($_SERVER['argv'][3]) ? $_SERVER['argv'][3] : 'c');
+$input_time_zone = new DateTimeZone(isset($_SERVER['argv'][4]) ? $_SERVER['argv'][4] : 'UTC');
+$output_time_zone = new DateTimeZone(isset($_SERVER['argv'][5]) ? $_SERVER['argv'][5] : 'UTC');
+fputcsv(STDOUT, fgetcsv(STDIN)); // straight passthrough of headings
+while( ($fields = fgetcsv(STDIN))!==false ) {
+	foreach($date_fields as $base0index) {
+		if($fields[$base0index] != '' && $fields[$base0index] != '\N' && $fields[$base0index] != '0000-00-00 00:00:00') {
+			$datetime = DateTime::createFromFormat($input_format, $fields[$base0index], $input_time_zone);
+			$datetime->setTimezone($output_time_zone);
+			$fields[$base0index] = $datetime->format($output_format);
+		}
+	}
+	fputcsv(STDOUT, $fields);
+}
