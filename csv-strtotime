@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+/*	Swap the given fields for UNIX epoch seconds, based on the strtotime() method
+ *	
+ *	Arguments:
+ *	1	CSV of base-1 column indexes that should be parsed as dates
+ */
+$date_fields = array_map(
+	function ($base1index) {
+		return $base1index - 1;
+	},
+	str_getcsv($_SERVER['argv'][1])
+);
+fputcsv(STDOUT, fgetcsv(STDIN)); // straight passthrough of headings
+while( ($fields = fgetcsv(STDIN))!==false ) {
+	foreach($date_fields as $base0index) {
+		if($fields[$base0index] != '' && $fields[$base0index] != '\N' && $fields[$base0index] != '0000-00-00 00:00:00') {
+			$fields[$base0index] = strtotime($fields[$base0index]);
+		}
+	}
+	fputcsv(STDOUT, $fields);
+}
