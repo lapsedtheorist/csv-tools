@@ -1,5 +1,15 @@
 #!/usr/bin/env php
 <?php
+// Stronger type handling for boolean true and false, outputting a text representation so FALSE and blank are differentiable
+function v($value) {
+	if(is_bool($value)) {
+		return $value ? 'TRUE' : 'FALSE';
+	} else {
+		return $value;
+	}
+}
+
+
 // Recursive flatten an N-level nested structure
 function flatten($value, $prefix=null) {
 	if(is_array($value)) {
@@ -9,7 +19,7 @@ function flatten($value, $prefix=null) {
 		}
 		return $flat;
 	} else {
-		return (isset($prefix) ? array($prefix=>$value) : $value);
+		return (isset($prefix) ? array($prefix=>v($value)) : v($value));
 	}
 }
 
