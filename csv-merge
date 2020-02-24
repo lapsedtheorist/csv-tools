@@ -3,7 +3,7 @@
 /*
  * Merge two CSV files, by a common (unique) identifier in column 1
  */
-ini_set('memory_limit', '2G');
+ini_set('memory_limit', '8G');
 
 /*
  *	Read the second file and unique index it by first column
