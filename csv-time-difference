@@ -1,0 +1,48 @@
+#!/usr/bin/env php
+<?php
+/*	For the field pairs supplied on the command line, compute the offset in
+ *	seconds between the datetimes in the fields and add a new field with
+ *	the result.
+ *	
+ *	For example...
+ *	`compute-offsets 3-2 4-2 < input.csv > output.csv`
+ *
+ *	The field offsets are computed by subtracting the value in the second
+ *	field from the value in the first, for each pair of fields, as
+ *	represented mathematically on the command line.
+ *
+ *	The offset is returned as the ceiling of the time interval, i.e. a time
+ *	difference of 2.4 seconds will be returned as an offset of 3 seconds.
+ *	This is a consequence of the primary use of this script, which is to
+ *	help compute the number of journeys processed within 'n' seconds.
+ *
+ *	Where one of the inputs is "blank", a "blank" is returned in the output
+ *	CSV.
+ */
+date_default_timezone_set("UTC");
+$bucket_duration = 1; // duration in seconds to classify the time offset
+
+$input_headings = fgetcsv(STDIN, 4096);
+$output_headings = $input_headings;
+$field_pairs = array();
+foreach($_SERVER['argv'] as $arg) {
+	$i = explode('-', $arg);
+	if(count($i) == 2 && isset($input_headings[$i[0]-1]) && isset($input_headings[$i[1]-1])) {
+		$field_pairs[] = array('1st'=>$i[0]-1, '2nd'=>$i[1]-1);
+		$output_headings[] = $input_headings[$i[0]-1].'-'.$input_headings[$i[1]-1];
+	}
+}
+fputcsv(STDOUT, $output_headings);
+while( ($fields = fgetcsv(STDIN, 4096))!==false ) {
+	foreach($field_pairs as $f) {
+		if(
+			$fields[$f['1st']] != '' && $fields[$f['1st']] != '\N' && $fields[$f['1st']] != '0000-00-00 00:00:00'
+			&& $fields[$f['2nd']] != '' && $fields[$f['2nd']] != '\N' && $fields[$f['2nd']] != '0000-00-00 00:00:00'
+		) {
+			$fields[] = ceil((strtotime($fields[$f['1st']]) - strtotime($fields[$f['2nd']]))/$bucket_duration)*$bucket_duration;
+		} else {
+			$fields[] = '';
+		}
+	}
+	fputcsv(STDOUT, $fields);
+}
