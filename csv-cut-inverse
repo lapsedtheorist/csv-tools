@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+/*	Exclude columns from a CSV (sent over stdin), picking only those columns 
+ *	specified by a comma separated list as the first argument.
+ */
+$sequence = array_map(
+	function ($base1index) {
+		return $base1index - 1;
+	},
+	str_getcsv($_SERVER['argv'][1])
+);
+while( ($fields = fgetcsv(STDIN))!==false ) {
+	foreach($sequence as $base0index) {
+		unset($fields[$base0index]);
+	}
+	fputcsv(STDOUT, $fields);
+}
