@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+$headings = fgetcsv(STDIN);
+while( ($fields = fgetcsv(STDIN))!==false ) {
+	fputs(
+		STDOUT,
+		json_encode(
+			array_combine(
+				$headings,
+				$fields
+			),
+			JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE
+		)
+	);
+}
