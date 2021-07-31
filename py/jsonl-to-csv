@@ -17,9 +17,9 @@ argparser = argparse.ArgumentParser(
         description="""Take one or more JSON files that have one JSON structure
         per line (i.e. JSON Lines format), flatten each using JSON path
         notation, and write the output as a corresponding CSV file with a
-        simple name suffix"""
+        simple name suffix. For input over STDIN, output will be on STDOUT."""
         )
-argparser.add_argument("file.json", nargs="+", help="JSON Lines file")
+argparser.add_argument("file.json", nargs="+", help="JSON Lines file, or '-' for STDIN")
 args = vars(argparser.parse_args())
 
 def flatten(value, prefix=None):
@@ -71,16 +71,29 @@ all_keys = set()
 data = []
 
 for filepath in args["file.json"]:
-    with open(filepath, 'r') as input_file:
-        for line in input_file:
+    if filepath == "-":
+        for line in sys.stdin:
             d = flatten(json.loads(line))
             all_keys = all_keys.union(d.keys())
             data.append(d)
 
-    headings = list(all_keys)
-    headings.sort(key=natural_keys)
+        headings = list(all_keys)
+        headings.sort(key=natural_keys)
 
-    with open(filepath + ".csv", "w", newline="") as output_file:
-        writer = csv.DictWriter(output_file, fieldnames=headings)
+        writer = csv.DictWriter(sys.stdout, fieldnames=headings)
         writer.writeheader()
         writer.writerows(data)
+    else:
+        with open(filepath, 'r') as input_file:
+            for line in input_file:
+                d = flatten(json.loads(line))
+                all_keys = all_keys.union(d.keys())
+                data.append(d)
+
+        headings = list(all_keys)
+        headings.sort(key=natural_keys)
+
+        with open(filepath + ".csv", "w", newline="") as output_file:
+            writer = csv.DictWriter(output_file, fieldnames=headings)
+            writer.writeheader()
+            writer.writerows(data)
