@@ -69,9 +69,9 @@ def natural_keys(text):
 
 for filepath in args["file.json"]:
     all_keys = set()
-    data = []
 
     if filepath == "-":
+        data = []
         for line in sys.stdin:
             d = flatten(json.loads(line))
             all_keys = all_keys.union(d.keys())
@@ -88,7 +88,6 @@ for filepath in args["file.json"]:
             for line in input_file:
                 d = flatten(json.loads(line))
                 all_keys = all_keys.union(d.keys())
-                data.append(d)
 
         headings = list(all_keys)
         headings.sort(key=natural_keys)
@@ -96,4 +95,7 @@ for filepath in args["file.json"]:
         with open(filepath + ".csv", "w", newline="") as output_file:
             writer = csv.DictWriter(output_file, fieldnames=headings)
             writer.writeheader()
-            writer.writerows(data)
+            with open(filepath, 'r') as input_file:
+                for line in input_file:
+                    d = flatten(json.loads(line))
+                    writer.writerow(d)
