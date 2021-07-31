@@ -67,10 +67,10 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
 
-all_keys = set()
-data = []
-
 for filepath in args["file.json"]:
+    all_keys = set()
+    data = []
+
     if filepath == "-":
         for line in sys.stdin:
             d = flatten(json.loads(line))
